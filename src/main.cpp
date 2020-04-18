@@ -1,45 +1,47 @@
-#include "skeleton/skeleton.hpp"
-#include "util/debug.hpp"
-#include <string_view>
+#include <skeleton/skeleton.hpp>
+#include <util/debug.hpp>
+#include <util/config.hpp>
 #include <unistd.h>
 
-constexpr double threshhold = 0.1;
-constexpr int WIDTH = 60;
+
+/*
+	program \
+		--mode mode \
+		--model model \
+		--protofile protofile\
+		--weightsfile weightfile\
+		--threshhold 0.1\
+		--width 368\
+		-i infile.jpg\
+		-o outfile.jpg
+*/
 
 int main(int argc, char** argv){
 	// std::string protoFile = "../pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt";
-	std::string protoFile = "/home/prototano/Projects/UA/4/TFG/open-pose/pose/coco/pose_deploy_linevec.prototxt";
-	std::string weightsFile = "../pose/mpi/pose_iter_160000.caffemodel";
 	// std::string weightsFile = "/home/prototano/Projects/UA/4/TFG/open-pose/pose/coco/pose_iter_440000.caffemodel";
-	Skeleton::loadNetwork(protoFile, weightsFile);	
 	
-	if(argc == 1){
+	Config conf{argc, argv};
+	conf.show();
+
+	Skeleton::loadNetwork(conf.protoFile, conf.weightsFile);	
+
+	if(conf.mode == Config::Mode::streaming){
 		cv::VideoCapture capture{0};
 		cv::Mat frame;
 		if(capture.isOpened()){
 			for(;;){
 				debug_timer_start(jajaja)
 				capture >> frame;
-				Skeleton skltn(frame,threshhold, WIDTH);
+				Skeleton skltn(frame, conf.threshhold, conf.width);
 				skltn.show("jajajaja");
 				debug_timer_finish(jajaja)
 			}
 		}
-	}
-	std::string filename = argv[1];
-
-	Skeleton skltn(filename, threshhold, WIDTH);
-
-	if(argc >= 3){
-		skltn.saveImage(argv[2]);
-		return 0;
+	}else{
+		Skeleton skltn(conf.inFile, conf.threshhold, conf.width);
+		skltn.saveImage(conf.outFile);
 	}
 
-	skltn.show("jajaja");
-
-	for(;;){
-		sleep(1);
-	}
 
 	return 0;
 }
