@@ -20,6 +20,6 @@ add_definitions()
 
 file(GLOB_RECURSE ALLCPP RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
 add_executable(myprogram ${ALLCPP} ${ALLHPP})
-target_include_directories(myprogram PRIVATE src)
+target_include_directories(myprogram PRIVATE include)
 TARGET_LINK_LIBRARIES(myprogram ${OpenCV_LIBS})
 

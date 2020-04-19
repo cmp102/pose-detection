@@ -1,5 +1,5 @@
-#include "skeleton.hpp"
-#include "util/debug.hpp"
+#include <skeleton/skeleton.hpp>
+#include <util/debug.hpp>
 #include <skeleton/model/modelcoco.hpp>
 #include <skeleton/model/modelmpii.hpp>
 #include <opencv2/dnn.hpp>
