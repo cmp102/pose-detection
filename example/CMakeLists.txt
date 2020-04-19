@@ -10,5 +10,7 @@ set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize=address")
 
 add_subdirectory(../ openp)
 
-add_executable(${PROJECT_NAME} main.cpp)
+file(GLOB_RECURSE ALLCPP ${CMAKE_SOURCE_DIR} "src/*.cpp")
+add_executable(${PROJECT_NAME} ${ALLCPP})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} openPose)

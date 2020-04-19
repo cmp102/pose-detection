@@ -1,6 +1,6 @@
 #include <skeleton/skeleton.hpp>
 #include <util/debug.hpp>
-#include <util/config.hpp>
+#include <config.hpp>
 #include <unistd.h>
 
 

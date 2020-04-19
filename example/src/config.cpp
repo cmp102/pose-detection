@@ -1,4 +1,4 @@
-#include <util/config.hpp>
+#include <config.hpp>
 
 Config::Config(int argc, char** argv){
 	for(int i=1; i<argc; ++i){
