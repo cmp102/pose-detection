@@ -4,8 +4,6 @@ PROJECT(openPose)
 
 find_package( OpenCV REQUIRED )
 
-include_directories( ${OpenCV_INCLUDE_DIRS})
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -14,12 +12,17 @@ set(CMAKE_CXX_FLAGS "-Wall --pedantic")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize=address")
 
-add_definitions()
+
+include_directories( 
+	${OpenCV_INCLUDE_DIRS}
+	include
+)
 
 
+file(GLOB_RECURSE ALLCPP ${CMAKE_SOURCE_DIR} "src/*.cpp")
 
-file(GLOB_RECURSE ALLCPP RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
-add_executable(myprogram ${ALLCPP} ${ALLHPP})
-target_include_directories(myprogram PRIVATE include)
-TARGET_LINK_LIBRARIES(myprogram ${OpenCV_LIBS})
+
+add_library(${PROJECT_NAME} STATIC ${ALLCPP})
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
