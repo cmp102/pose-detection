@@ -21,10 +21,10 @@ Config::Config(int argc, char** argv){
 			}
 		}else if(option == "--model"){
 			if(++i < argc){
-				if(std::string("mpi") == argv[i]){
-					model=ModelType::mpi;
+				if(std::string("mpii") == argv[i]){
+					model=Skeleton::mpii;
 				}else if(std::string("coco") == argv[i]){
-					model=ModelType::coco;
+					model=Skeleton::coco;
 				}
 			}
 		}else if(option == "--protofile"){

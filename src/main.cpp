@@ -23,7 +23,7 @@ int main(int argc, char** argv){
 	Config conf{argc, argv};
 	conf.show();
 
-	Skeleton::loadNetwork(conf.protoFile, conf.weightsFile);	
+	Skeleton::loadNetwork(conf.protoFile, conf.weightsFile, conf.model);	
 
 	if(conf.mode == Config::Mode::streaming){
 		cv::VideoCapture capture{0};

@@ -2,10 +2,10 @@
 
 #include <string>
 #include <iostream>
+#include <skeleton/skeleton.hpp>
 
 struct Config{
 	//Enums 
-	enum ModelType {coco, mpi};
 	enum Mode {streaming, image};
 
 	explicit Config(int argc, char** argv);
@@ -15,7 +15,7 @@ struct Config{
 	//Data
 	std::string protoFile;
 	std::string weightsFile;
-	ModelType model {coco};
+	Skeleton::ModelType model {Skeleton::coco};
 	Mode mode;
 	std::string inFile;
 	std::string outFile;

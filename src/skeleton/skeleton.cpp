@@ -1,5 +1,7 @@
 #include "skeleton.hpp"
 #include "util/debug.hpp"
+#include <skeleton/model/modelcoco.hpp>
+#include <skeleton/model/modelmpii.hpp>
 #include <opencv2/dnn.hpp>
 #include <chrono>
 
@@ -52,7 +54,7 @@ void Skeleton::extractJoints2(double threshhold=0.1, int width=368){
 	int h = netOutputBlob.size[2];
 	int w = netOutputBlob.size[3];
 
-	for(int joint=0; joint < Joint::JOINTCOUNT; ++joint){
+	for(unsigned int joint=0; joint < Skeleton::model->getMaxJoints(); ++joint){
 		double maxVal;
 		cv::Point maxLoc;
 		cv::Mat part(h, w, CV_32F, netOutputBlob.ptr(0,joint));
@@ -70,7 +72,7 @@ void Skeleton::extractJoints(double threshhold=0.1, int width=368){
 	auto netOutputBlob = processImage(width);
 	auto netOutputParts = splitNetOutput(netOutputBlob, cv::Size(image.cols,image.rows));
 
-	for(int joint=0; joint < Joint::JOINTCOUNT; ++joint){
+	for(unsigned int joint=0; joint < Skeleton::model->getMaxJoints(); ++joint){
 		double maxVal;
 		cv::Point maxLoc;
 		cv::minMaxLoc(netOutputParts[joint],0,&maxVal,0,&maxLoc);
@@ -82,11 +84,13 @@ void Skeleton::extractJoints(double threshhold=0.1, int width=368){
 }
 
 Skeleton::Skeleton(std::string_view filename, double threshhold, int width) : image { cv::imread(filename.data(), cv::IMREAD_COLOR)}{
+	this->jointsVec.resize(Skeleton::model->getMaxJoints());
 	extractJoints2(threshhold,width);
 	paint();
 }
 
 Skeleton::Skeleton(const cv::Mat& img, double threshhold, int width) : image {img}{
+	this->jointsVec.resize(Skeleton::model->getMaxJoints());
 	extractJoints2(threshhold,width);
 	paint();
 }
@@ -102,7 +106,7 @@ void Skeleton::saveImage(std::string_view filename) const{
 
 void Skeleton::paint(){
 	auto& outputFrame = image;
-	for( auto& [j1, j2] : Skeleton::pairs ){
+	for( auto& [j1, j2] : Skeleton::model->getPairs() ){
 		if(jointsVec[j1] && jointsVec[j2]){
 			cv::line(
 				outputFrame, 
@@ -125,7 +129,12 @@ void Skeleton::paint(){
 	}
 }
 
-void Skeleton::loadNetwork(std::string_view prototxt, std::string_view caffeModel){
+void Skeleton::loadNetwork(std::string_view prototxt, std::string_view caffeModel, Skeleton::ModelType mtype){
 	neuralNet = cv::dnn::readNetFromCaffe(prototxt.data(), caffeModel.data());
+	if(mtype == Skeleton::mpii){
+		Skeleton::model = std::make_unique<ModelMPII>();
+	}else{
+		Skeleton::model = std::make_unique<ModelCoco>();
+	}
 }
 
