@@ -19,8 +19,10 @@
 int main(int argc, char** argv){
 	// std::string protoFile = "../pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt";
 	// std::string weightsFile = "/home/prototano/Projects/UA/4/TFG/open-pose/pose/coco/pose_iter_440000.caffemodel";
-	
-	Config conf{argc, argv};
+	if(argc != 2){
+		return 1;
+	}
+	Config conf{argv[1]};
 	conf.show();
 
 	Skeleton::loadNetwork(conf.protoFile, conf.weightsFile, conf.model);	

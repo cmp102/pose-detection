@@ -8,7 +8,7 @@ struct Config{
 	//Enums 
 	enum Mode {streaming, image};
 
-	explicit Config(int argc, char** argv);
+	explicit Config(std::string_view filename);
 
 	void show();
 

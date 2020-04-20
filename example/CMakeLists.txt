@@ -12,5 +12,5 @@ add_subdirectory(../ openp)
 
 file(GLOB_RECURSE ALLCPP ${CMAKE_SOURCE_DIR} "src/*.cpp")
 add_executable(${PROJECT_NAME} ${ALLCPP})
-target_include_directories(${PROJECT_NAME} PRIVATE include)
-target_link_libraries(${PROJECT_NAME} openPose)
+target_include_directories(${PROJECT_NAME} PRIVATE include libs/cpp_confparser/include)
+target_link_libraries(${PROJECT_NAME} openPose ${CMAKE_SOURCE_DIR}/libs/cpp_confparser/confparser.a)

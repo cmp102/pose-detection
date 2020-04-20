@@ -1,50 +1,38 @@
 #include <config.hpp>
+#include <confparser.hpp>
+#include <sstream>
 
-Config::Config(int argc, char** argv){
-	for(int i=1; i<argc; ++i){
-		std::string option = argv[i];
-		if(option == "--mode"){
-			if(++i < argc){
-				if(std::string("streaming") == argv[i]){
-					mode=Mode::streaming;
-				}else if(std::string("image") == argv[i]){
-					mode=Mode::image;
-				}
-			}
-		}else if(option == "-i"){
-			if(++i < argc){
-				inFile = argv[i];
-			}
-		}else if(option == "-o"){
-			if(++i < argc){
-				outFile = argv[i];
-			}
-		}else if(option == "--model"){
-			if(++i < argc){
-				if(std::string("mpii") == argv[i]){
-					model=Skeleton::mpii;
-				}else if(std::string("coco") == argv[i]){
-					model=Skeleton::coco;
-				}
-			}
-		}else if(option == "--protofile"){
-			if(++i < argc){
-				protoFile = argv[i];
-			}
-		}else if(option == "--weightsfile"){
-			if(++i < argc){
-				weightsFile = argv[i];
-			}
-		}else if(option == "--threshhold"){
-			if(++i < argc){
-				threshhold = atof(argv[i]);
-			}
-		}else if(option == "--width"){
-			if(++i < argc){
-				width = atoi(argv[i]);
-			}
-		}
+std::stringstream& operator>> (std::stringstream& ss, Skeleton::ModelType& model){
+	if(ss.str() == "coco"){
+		model = Skeleton::ModelType::coco;
+	}else if(ss.str() == "mpii"){
+		model = Skeleton::ModelType::mpii;
 	}
+	return ss;
+} 
+
+std::stringstream& operator>> (std::stringstream& ss, Config::Mode& mode){
+	if(ss.str() == "image"){
+		mode = Config::Mode::image;
+	}else if(ss.str() == "streaming"){
+		mode = Config::Mode::streaming;
+	}
+	return ss;
+} 
+
+Config::Config(std::string_view filename){
+	confparser::Config cnf;
+	
+	cnf.bindParam("mode"				,mode);
+	cnf.bindParam("input"			,inFile);
+	cnf.bindParam("output"			,outFile);
+	cnf.bindParam("model"			,model);
+	cnf.bindParam("protofile"		,protoFile);
+	cnf.bindParam("weightsfile"	,weightsFile);
+	cnf.bindParam("threshhold"		,threshhold);
+	cnf.bindParam("width"			,width);
+
+	cnf.loadFile(filename);
 }
 
 void Config::show(){
