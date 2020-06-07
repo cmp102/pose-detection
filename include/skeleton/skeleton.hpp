@@ -23,6 +23,8 @@ struct Skeleton{
 	void show(std::string_view windowName) const;
 	void saveImage(std::string_view filename) const;
 	static void loadNetwork(std::string_view prototxt, std::string_view caffeModel, ModelType mtype);
+	void paint();
+	constexpr const cv::Mat& getImage() const {return image;};
 
 	//
 	//PRIVATE STUFF
@@ -33,7 +35,6 @@ struct Skeleton{
 	void extractJoints(double threshhold, int width);
 	void extractJoints2(double threshhold, int width);
 	cv::Mat processImage(int width);
-	void paint();
 	inline static cv::dnn::Net neuralNet {};
 	inline static std::unique_ptr<IModel> model {nullptr};
 
