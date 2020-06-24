@@ -88,14 +88,12 @@ Skeleton::Skeleton(std::string_view filename, double threshhold, int width)
 {
 	this->jointsVec.resize(Skeleton::model->getMaxJoints());
 	extractJoints2(threshhold,width);
-	paint();
 }
 
 Skeleton::Skeleton(const cv::Mat& img, double threshhold, int width)
 	: image {img}{
 		this->jointsVec.resize(Skeleton::model->getMaxJoints());
 		extractJoints2(threshhold,width);
-		paint();
 	}
 
 void Skeleton::show(std::string_view windowName) const{
@@ -131,6 +129,43 @@ void Skeleton::paint(){
 		}
 	}
 }
+
+
+void rotateMat(double angle, cv::Mat& m){
+	// get rotation matrix for rotating the image around its center in pixel coordinates
+	cv::Point2f center((m.cols-1)/2.0, (m.rows-1)/2.0);
+	cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+	// determine bounding rectangle, center not relevant
+	cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), m.size(), angle).boundingRect2f();
+	// adjust transformation matrix
+	rot.at<double>(0,2) += bbox.width/2.0 - m.cols/2.0;
+	rot.at<double>(1,2) += bbox.height/2.0 - m.rows/2.0;
+
+	cv::Mat dst;
+	cv::warpAffine(m, dst, rot, bbox.size());
+	m=dst;
+};
+
+//Rotates entire skeleton
+void Skeleton::rotate(double degrees){
+	if(degrees == 0){
+		return;
+	}
+	int rows {image.rows}; 
+	int cols {image.cols};
+
+	rotateMat(degrees, image);
+
+	for(auto& jointOp : jointsVec){
+		if(jointOp){
+			cv::Mat mAux {cv::Size(cols, rows), CV_8U, cv::Scalar{0}};
+			mAux.at<char>(jointOp.value()) = 1;
+			rotateMat(degrees, mAux);
+			cv::minMaxLoc(mAux,0,0,0,&jointOp.value());
+		}
+	}
+}
+
 
 void Skeleton::loadNetwork(std::string_view prototxt, std::string_view caffeModel, Skeleton::ModelType mtype){
 	neuralNet = cv::dnn::readNetFromCaffe(prototxt.data(), caffeModel.data());

@@ -19,11 +19,12 @@ struct Skeleton{
 	explicit Skeleton(const cv::Mat& img, double threshhold=0.1, int width=368);
 
 
-	const std::optional<cv::Point>& getJointPos(unsigned int j) const;
+	const std::optional<cv::Point>& getJointPos(unsigned int j) const {return jointsVec.at(j);};
 	void show(std::string_view windowName) const;
 	void saveImage(std::string_view filename) const;
 	static void loadNetwork(std::string_view prototxt, std::string_view caffeModel, ModelType mtype);
 	void paint();
+	void rotate(double degrees);
 	constexpr const cv::Mat& getImage() const {return image;};
 
 	//
