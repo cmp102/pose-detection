@@ -83,18 +83,39 @@ void Skeleton::extractJoints(double threshhold=0.1, int width=368){
 	}
 }
 
-Skeleton::Skeleton(std::string_view filename, double threshhold, int width)
-	: image { cv::imread(filename.data(), cv::IMREAD_COLOR)}
+Skeleton::Skeleton(
+		std::string_view filename,
+		double threshhold,
+		int width,
+		double orientation) :
+	image { cv::imread(filename.data(), cv::IMREAD_COLOR)}
 {
+	if(orientation != 0){
+		rotateMat(orientation, image);
+	}
 	this->jointsVec.resize(Skeleton::model->getMaxJoints());
 	extractJoints2(threshhold,width);
+	if(orientation != 0){
+		rotate(-orientation);
+	}
 }
 
-Skeleton::Skeleton(const cv::Mat& img, double threshhold, int width)
-	: image {img}{
-		this->jointsVec.resize(Skeleton::model->getMaxJoints());
-		extractJoints2(threshhold,width);
+Skeleton::Skeleton(
+		const cv::Mat& img,
+		double threshhold,
+		int width,
+		double orientation) :
+	image {img}
+{
+	if(orientation != 0){
+		rotateMat(orientation, image);
 	}
+	this->jointsVec.resize(Skeleton::model->getMaxJoints());
+	extractJoints2(threshhold,width);
+	if(orientation != 0){
+		rotate(-orientation);
+	}
+}
 
 void Skeleton::show(std::string_view windowName) const{
 	cv::imshow(windowName.data(),image);
@@ -131,12 +152,18 @@ void Skeleton::paint(){
 }
 
 
-void rotateMat(double angle, cv::Mat& m){
-	// get rotation matrix for rotating the image around its center in pixel coordinates
+void Skeleton::rotateMat(double angle, cv::Mat& m){
+	// get rotation matrix for rotating the image around its center in pixel
+	// coordinates
 	cv::Point2f center((m.cols-1)/2.0, (m.rows-1)/2.0);
 	cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+
 	// determine bounding rectangle, center not relevant
-	cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), m.size(), angle).boundingRect2f();
+	cv::Rect2f bbox = cv::RotatedRect(
+			cv::Point2f(),
+			m.size(),
+			angle).boundingRect2f();
+
 	// adjust transformation matrix
 	rot.at<double>(0,2) += bbox.width/2.0 - m.cols/2.0;
 	rot.at<double>(1,2) += bbox.height/2.0 - m.rows/2.0;
@@ -151,7 +178,7 @@ void Skeleton::rotate(double degrees){
 	if(degrees == 0){
 		return;
 	}
-	int rows {image.rows}; 
+	int rows {image.rows};
 	int cols {image.cols};
 
 	rotateMat(degrees, image);
