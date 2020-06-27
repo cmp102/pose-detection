@@ -26,6 +26,8 @@ struct Skeleton{
 	void paint();
 	void rotate(double degrees);
 	constexpr const cv::Mat& getImage() const {return image;};
+	inline static std::unique_ptr<IModel> model {nullptr};
+
 
 	//
 	//PRIVATE STUFF
@@ -37,6 +39,5 @@ struct Skeleton{
 	void extractJoints2(double threshhold, int width);
 	cv::Mat processImage(int width);
 	inline static cv::dnn::Net neuralNet {};
-	inline static std::unique_ptr<IModel> model {nullptr};
-
 };
+
