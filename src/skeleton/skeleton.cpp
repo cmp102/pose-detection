@@ -105,7 +105,7 @@ Skeleton::Skeleton(
 		double threshhold,
 		int width,
 		double orientation) :
-	image {img}
+	image {img.clone()}
 {
 	if(orientation != 0){
 		rotateMat(orientation, image);
@@ -127,11 +127,10 @@ void Skeleton::saveImage(std::string_view filename) const{
 }
 
 void Skeleton::paint(){
-	auto& outputFrame = image;
 	for( auto& [j1, j2] : Skeleton::model->getPairs() ){
 		if(jointsVec[j1] && jointsVec[j2]){
 			cv::line(
-					outputFrame,
+					image,
 					jointsVec[j1].value(),
 					jointsVec[j2].value(),
 					cv::Scalar(255,0,0),
@@ -141,7 +140,7 @@ void Skeleton::paint(){
 	for(auto& joint : jointsVec){
 		if(joint){
 			cv::circle(
-					outputFrame,
+					image,
 					joint.value(),
 					10,
 					cv::Scalar(0,255,0),
